@@ -1,0 +1,724 @@
+ <!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>องศามีอะไรจะบอกมิ้นด้วยยย...🩷 | Stargazer Pink Lily Proposal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti for Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Prompt & Charm -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Charm:wght@400;700&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #996670 0%, #7b2f3d 40%, #d28795 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .font-handwriting {
+            font-family: 'Charm', cursive; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 182, 193, 0.5);
+            box-shadow: 0 10px 40px -10px rgba(225, 75, 120, 0.22);
+        }
+        #petal-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        @keyframes pulse-gentle {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.3)); }
+            50% { transform: scale(1.04); filter: drop-shadow(0 0 25px rgba(255, 105, 180, 0.5)); }
+        }
+        .animate-pulse-lily {
+            animation: pulse-gentle 3s infinite ease-in-out;
+        }
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        .animate-float {
+            animation: float-slow 4s infinite ease-in-out;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffe5ec;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff758f;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-gray-700 relative selection:bg-pink-200 selection:text-pink-800">
+
+    <!-- Canvas for Floating Realistic Petals -->
+    <canvas id="petal-canvas"></canvas>
+
+    <div class="fixed top-4 right-4 z-50">
+        <button id="open-settings-btn" class="glass-card hover:bg-white text-pink-600 px-4 py-2 rounded-full shadow-md flex items-center gap-2 transition text-sm font-medium border border-pink-200 hover:scale-105 active:scale-95">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>ปรับแต่งชื่อ & ข้อความ</span>
+        </button>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="container mx-auto px-4 py-8 max-w-2xl relative z-20 min-h-screen flex flex-col justify-center items-center">
+
+        <div class="w-full glass-card rounded-2xl p-4 mb-6 shadow-sm border border-pink-100 flex items-center gap-4 animate-float">
+            <div class="relative w-14 h-14 rounded-xl overflow-hidden shadow-inner flex-shrink-0 bg-pink-100 flex items-center justify-center">
+                <!-- Mini Realistic Pink Lily SVG Icon -->
+                <svg class="w-10 h-10 filter drop-shadow" viewBox="0 0 100 100">
+                    <path d="M50 15 Q30 45 15 55 Q35 65 50 85 Q65 65 85 55 Q70 45 50 15 Z" fill="url(#miniLilyGrad)"/>
+                    <circle cx="50" cy="55" r="4" fill="#ffd166"/>
+                    <defs>
+                        <linearGradient id="miniLilyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ff4d6d"/>
+                            <stop offset="60%" stop-color="#ff8fa3"/>
+                            <stop offset="100%" stop-color="#ffffff"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="flex-grow min-w-0">
+                <div class="flex justify-between items-center mb-1">
+                    <h4 id="player-song-title" class="font-medium text-pink-900 text-sm truncate">เพลงสำหรับเธอ - Stargazer Lily Melody</h4>
+                    <span id="player-time" class="text-xs text-pink-500 font-mono">01:24 / 03:45</span>
+                </div>
+                <div class="w-full bg-pink-100 h-1.5 rounded-full overflow-hidden mb-2">
+                    <div id="player-progress" class="bg-gradient-to-r from-pink-500 to-rose-400 h-full w-2/5 rounded-full transition-all duration-300"></div>
+                </div>
+                <div class="flex justify-between items-center text-xs text-pink-500">
+                    <span class="text-pink-600 font-light"><i class="fa-solid fa-heart mr-1 text-pink-500"></i> บรรยากาศแห่งความรัก</span>
+                    <button id="play-pause-btn" class="text-pink-600 hover:text-pink-800 focus:outline-none transition">
+                        <i id="play-icon" class="fa-solid fa-pause text-base"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section id="step-cover" class="w-full glass-card rounded-3xl p-6 sm:p-10 text-center shadow-xl border border-pink-200 transition-all duration-500">
+            
+            <!-- Highly Detailed Realistic Pink Stargazer Lily SVG -->
+            <div class="mx-auto w-48 h-48 sm:w-56 sm:h-56 mb-2 relative flex items-center justify-center animate-pulse-lily">
+                <svg class="w-full h-full filter drop-shadow-xl" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Petal Main Gradient (Dark Magenta Pink center to White edges) -->
+                        <radialGradient id="stargazerPetalGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="90%">
+                            <stop offset="0%" stop-color="#a4133c"/>
+                            <stop offset="30%" stop-color="#c9184a"/>
+                            <stop offset="60%" stop-color="#ff4d6d"/>
+                            <stop offset="85%" stop-color="#ffb3c1"/>
+                            <stop offset="100%" stop-color="#ffffff"/>
+                        </radialGradient>
+                        
+                        <!-- Back Petal Soft Gradient -->
+                        <radialGradient id="backPetalGrad" cx="50%" cy="50%" r="60%">
+                            <stop offset="0%" stop-color="#800f2f"/>
+                            <stop offset="40%" stop-color="#ff4d6d"/>
+                            <stop offset="90%" stop-color="#ffccd5"/>
+                            <stop offset="100%" stop-color="#ffffff"/>
+                        </radialGradient>
+
+                        <!-- Stem Leaf Gradient -->
+                        <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#2b9348"/>
+                            <stop offset="50%" stop-color="#55a630"/>
+                            <stop offset="100%" stop-color="#80b918"/>
+                        </linearGradient>
+
+                        <!-- Center Lime Glow -->
+                        <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#ccff33"/>
+                            <stop offset="40%" stop-color="#70e000"/>
+                            <stop offset="100%" stop-color="#c9184a" stop-opacity="0"/>
+                        </radialGradient>
+
+                        <!-- Lily Freckles/Speckles Pattern Dot -->
+                        <filter id="shadow">
+                            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.2"/>
+                        </filter>
+                    </defs>
+
+                    <!-- Green Stem & Leaves -->
+                    <path d="M150 200 Q145 250 140 290" stroke="#38b000" stroke-width="8" stroke-linecap="round" fill="none"/>
+                    <path d="M145 230 Q110 220 85 200 Q120 205 145 230" fill="url(#leafGrad)"/>
+                    <path d="M142 250 Q180 240 205 215 Q170 225 142 250" fill="url(#leafGrad)"/>
+
+                    <!-- BACK PETALS (Layer 1) -->
+                    <!-- Top Petal -->
+                    <path d="M150 150 C130 90, 110 30, 150 15 C190 30, 170 90, 150 150 Z" fill="url(#backPetalGrad)"/>
+                    <!-- Bottom Left Petal -->
+                    <path d="M150 150 C90 160, 30 190, 25 145 C65 110, 110 135, 150 150 Z" fill="url(#backPetalGrad)"/>
+                    <!-- Bottom Right Petal -->
+                    <path d="M150 150 C210 160, 270 190, 275 145 C235 110, 190 135, 150 150 Z" fill="url(#backPetalGrad)"/>
+
+                    <!-- FRONT PETALS (Layer 2 with curved edges) -->
+                    <!-- Upper Left Petal -->
+                    <path d="M150 150 C80 120, 30 60, 65 35 C105 50, 125 110, 150 150 Z" fill="url(#stargazerPetalGrad)"/>
+                    <!-- Upper Right Petal -->
+                    <path d="M150 150 C220 120, 270 60, 235 35 C195 50, 175 110, 150 150 Z" fill="url(#stargazerPetalGrad)"/>
+                    <!-- Bottom Center Petal -->
+                    <path d="M150 150 C120 200, 130 270, 150 275 C170 270, 180 200, 150 150 Z" fill="url(#stargazerPetalGrad)"/>
+
+                    <!-- Petal Veins & Center Stripes -->
+                    <path d="M150 150 L150 35" stroke="#590d22" stroke-width="2" opacity="0.6"/>
+                    <path d="M150 150 L80 50" stroke="#590d22" stroke-width="2" opacity="0.6"/>
+                    <path d="M150 150 L220 50" stroke="#590d22" stroke-width="2" opacity="0.6"/>
+                    <path d="M150 150 L40 150" stroke="#590d22" stroke-width="2" opacity="0.6"/>
+                    <path d="M150 150 L260 150" stroke="#590d22" stroke-width="2" opacity="0.6"/>
+                    <path d="M150 150 L150 255" stroke="#590d22" stroke-width="2" opacity="0.6"/>
+
+                    <!-- Stargazer Lily Speckles / Freckles -->
+                    <g fill="#400312" opacity="0.75">
+                        <!-- Center dots around petals -->
+                        <circle cx="145" cy="110" r="1.5"/><circle cx="155" cy="100" r="2"/><circle cx="148" cy="85" r="1.5"/>
+                        <circle cx="120" cy="130" r="1.8"/><circle cx="110" cy="120" r="1.5"/><circle cx="130" cy="115" r="2"/>
+                        <circle cx="180" cy="130" r="1.8"/><circle cx="190" cy="120" r="1.5"/><circle cx="170" cy="115" r="2"/>
+                        <circle cx="135" cy="165" r="1.5"/><circle cx="145" cy="180" r="2"/><circle cx="155" cy="175" r="1.5"/>
+                        <circle cx="110" cy="155" r="1.5"/><circle cx="190" cy="155" r="1.5"/>
+                    </g>
+
+                    <!-- Center Star Lime Glow -->
+                    <circle cx="150" cy="150" r="22" fill="url(#centerGlow)"/>
+
+                    <!-- REALISTIC STAMENS & ANTHERS (Pollen Heads) -->
+                    <!-- Pistil (Center green female organ) -->
+                    <path d="M150 150 Q148 130 146 115" stroke="#9ef01a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                    <circle cx="146" cy="113" r="3.5" fill="#70e000"/>
+
+                    <!-- 6 Stamens with Orange/Brown Pollen Heads -->
+                    <!-- Stamen 1 -->
+                    <path d="M150 150 Q130 120 115 105" stroke="#e9edc9" stroke-width="2.5" fill="none"/>
+                    <rect x="107" y="100" width="14" height="6" rx="3" fill="#b04100" transform="rotate(-30 114 103)"/>
+                    
+                    <!-- Stamen 2 -->
+                    <path d="M150 150 Q140 115 135 90" stroke="#e9edc9" stroke-width="2.5" fill="none"/>
+                    <rect x="128" y="85" width="14" height="6" rx="3" fill="#b04100" transform="rotate(10 135 88)"/>
+
+                    <!-- Stamen 3 -->
+                    <path d="M150 150 Q160 115 165 90" stroke="#e9edc9" stroke-width="2.5" fill="none"/>
+                    <rect x="158" y="85" width="14" height="6" rx="3" fill="#b04100" transform="rotate(-10 165 88)"/>
+
+                    <!-- Stamen 4 -->
+                    <path d="M150 150 Q170 120 185 105" stroke="#e9edc9" stroke-width="2.5" fill="none"/>
+                    <rect x="179" y="100" width="14" height="6" rx="3" fill="#b04100" transform="rotate(30 186 103)"/>
+
+                    <!-- Stamen 5 -->
+                    <path d="M150 150 Q170 155 185 165" stroke="#e9edc9" stroke-width="2.5" fill="none"/>
+                    <rect x="179" y="160" width="14" height="6" rx="3" fill="#800f2f" transform="rotate(60 186 163)"/>
+
+                    <!-- Stamen 6 -->
+                    <path d="M150 150 Q130 155 115 165" stroke="#e9edc9" stroke-width="2.5" fill="none"/>
+                    <rect x="107" y="160" width="14" height="6" rx="3" fill="#800f2f" transform="rotate(-60 114 163)"/>
+                </svg>
+            </div>
+
+            <span class="inline-block px-4 py-1.5 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold tracking-wide uppercase mb-3 border border-pink-200">
+                🌸 Pink Lily of Pure Love 🌸
+            </span>
+            <h1 id="cover-title" class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2 leading-tight">
+                ถึง... <span id="display-receiver-name" class="text-pink-600 font-bold underline decoration-pink-300">เธอคนพิเศษ</span>
+            </h1>
+            <p id="cover-subtitle" class="text-gray-600 mb-8 text-sm sm:text-base max-w-md mx-auto">
+                ดอกลิลลี่สีชมพูเป็นตัวแทนของความรักที่บริสุทธิ์และจริงใจ... วันนี้ฉันมีเรื่องสำคัญอยากบอกเธอจากใจนะ ❤️
+            </p>
+
+            <button id="btn-open-letter" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 hover:from-pink-600 hover:to-rose-600 text-white font-medium px-8 py-3.5 rounded-full shadow-lg shadow-pink-300/50 hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 mx-auto group">
+                <span>เปิดอ่านความในใจ</span>
+                <i class="fa-solid fa-envelope-open-text group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </section>
+
+        <section id="step-letter" class="w-full glass-card rounded-3xl p-6 sm:p-8 shadow-xl border border-pink-200 hidden transition-all duration-500">
+            <div class="text-center mb-6">
+                <span class="text-pink-500 text-2xl font-handwriting">Meaning of Stargazer Lily</span>
+                <h2 class="text-2xl font-bold text-gray-800">ทำไมต้องเป็น "ดอกลิลลี่สีชมพู"?</h2>
+                <div class="w-16 h-1 bg-pink-300 mx-auto mt-2 rounded-full"></div>
+            </div>
+
+            <div class="space-y-4 mb-8">
+                <!-- Quote Box -->
+                <div class="bg-white/90 p-5 rounded-2xl border-l-4 border-pink-500 shadow-sm">
+                    <p class="text-gray-700 italic text-sm sm:text-base leading-relaxed">
+                        "ดอกลิลลี่สีชมพู (Pink Stargazer Lily) สื่อถึงความรักที่ผูกพัน ความหวานชื่น และความชื่นชมอันลึกซึ้ง... เปรียบเสมือนความรู้สึกองศาที่มีให้มิ้นตั้งแต่วันแรกจนถึงวันนี้"
+                    </p>
+                </div>
+
+                <!-- Memory Reason Cards -->
+                <div id="memory-cards-container" class="grid grid-cols-1 gap-3">
+                    <div class="bg-pink-50/80 p-4 rounded-xl border border-pink-100 flex items-start gap-3">
+                        <div class="p-2.5 bg-pink-200 text-pink-600 rounded-xl mt-0.5 shadow-sm">
+                            <i class="fa-solid fa-face-smile-beam text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-pink-900 text-sm sm:text-base">รอยยิ้มของมิ้นค่ดจะสวย องศาชอบที่สุด!</h4>
+                            <p class="text-xs sm:text-sm text-gray-600 mt-0.5">เวลามิ้นยิ้มองศาชอบมองทุกครั้ง</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-pink-50/80 p-4 rounded-xl border border-pink-100 flex items-start gap-3">
+                        <div class="p-2.5 bg-pink-200 text-pink-600 rounded-xl mt-0.5 shadow-sm">
+                            <i class="fa-solid fa-heart-circle-check text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-pink-900 text-sm sm:text-base">อยากมีมิ้นอยู่ในทุกๆวันเลยคั้บ</h4>
+                            <p class="text-xs sm:text-sm text-gray-600 mt-0.5">ไม่ว่าจะวันดีๆ หรือวันที่เหนื่อย แค่มีมิ้นอยู่ข้างๆ ทุกอย่างก็กลายเป็นเรื่องดีๆ เสมอ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customized Letter Content -->
+                <div class="bg-gradient-to-br from-pink-100/60 to-rose-50/60 p-5 rounded-2xl border border-pink-200/60">
+                    <p id="letter-content" class="text-gray-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-light">
+                        ขอบคุณสำหรับทุกช่วงเวลาที่ผ่านมานะ ไม่รู้ว่ามิ้นสังเกตไหม แต่ทุกนาทีที่ได้คุย ได้หัวเราะด้วยกัน มันมีความหมายกับองศามากจริงๆ วันนี้เลยตั้งใจทำสิ่งนี้ขึ้นมาเพื่อถามความในใจ...
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="btn-to-proposal" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-medium px-8 py-3.5 rounded-full shadow-lg shadow-pink-300/50 hover:shadow-xl transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 mx-auto">
+                    <span>ต่อไป อยากถามคำถามสำคัญ 🩷</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <section id="step-proposal" class="w-full glass-card rounded-3xl p-8 text-center shadow-xl border border-pink-200 hidden transition-all duration-500 relative overflow-hidden">
+
+            <div class="mb-6">
+                <span class="inline-block p-4 bg-pink-100 text-pink-500 rounded-full text-3xl mb-3 shadow-inner animate-bounce">
+                    💍
+                </span>
+                <h2 id="proposal-heading" class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+                    <span id="display-proposal-receiver" class="text-pink-600">มิ้นคั้บ</span>...
+                </h2>
+                <p id="proposal-main-question" class="text-xl sm:text-2xl font-semibold text-pink-600 my-4 leading-snug">
+                    "ตกลงเป็นแฟนกับ <span id="display-sender-name" class="text-rose-500 underline decoration-pink-300">องศา</span> ได้ไหมคะ?" 🩷
+                </p>
+                <p class="text-xs sm:text-sm text-gray-500">สัญญาว่าจะดูแลและทำให้เธอมีความสุขในทุกๆ วันเลยนะ!</p>
+            </div>
+
+            <!-- BUTTON ACTIONS AREA -->
+            <div id="proposal-actions" class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 min-h-[140px] relative">
+                <!-- YES BUTTON -->
+                <button id="btn-yes" class="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold px-8 py-4 rounded-full shadow-lg shadow-teal-200 hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 text-lg z-20">
+                    <i class="fa-solid fa-heart"></i>
+                    <span>ตกลงเป็นแฟนกัน 🩷</span>
+                </button>
+
+                <!-- NO / MAYBE BUTTON (Dodges mouse movement) -->
+                <button id="btn-no" class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-medium px-6 py-3 rounded-full transition-all duration-150 text-sm z-10 sm:relative">
+                    ขอคิดดูก่อน 😜
+                </button>
+            </div>
+
+            <p id="no-hint-text" class="text-xs text-pink-500 mt-4 opacity-0 transition-opacity">
+                (ฮั่นแน่... ปุ่มนั้นกดไม่ได้หรอกนะ ตอบตกลงซะดีๆ! )
+            </p>
+        </section>
+
+        <section id="step-celebration" class="w-full glass-card rounded-3xl p-8 text-center shadow-2xl border-2 border-pink-300 hidden transition-all duration-500 relative">
+
+            <div class="text-5xl mb-4 animate-bounce">🎉🌸💖</div>
+
+            <h2 class="text-3xl sm:text-4xl font-bold text-pink-600 mb-2">
+                เย้! เป็นแฟนกันแล้วนะ! 🥰
+            </h2>
+            <p id="celebration-message" class="text-gray-700 text-base sm:text-lg mb-6">
+                ขอบคุณที่ตอบตกลงนะคะ ต่อจากนี้ไปองศาจะดูแลเธอให้ดีที่สุดเลย 🩷
+            </p>
+
+            <!-- Relationship Counter Card -->
+            <div class="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 text-white rounded-2xl p-6 shadow-lg mb-6 max-w-md mx-auto">
+                <p class="text-xs uppercase tracking-widest font-semibold opacity-90 mb-1">วันแรกของเราสองคน</p>
+                <div id="start-date-display" class="text-lg font-medium mb-3">10 10 2026</div>
+                <div class="border-t border-pink-300/50 pt-3 flex justify-around">
+                    <div>
+                        <span id="counter-days" class="text-3xl font-bold block">1</span>
+                        <span class="text-xs opacity-80">วัน</span>
+                    </div>
+                    <div>
+                        <span id="counter-hours" class="text-3xl font-bold block">0</span>
+                        <span class="text-xs opacity-80">ชั่วโมง</span>
+                    </div>
+                    <div>
+                        <span id="counter-mins" class="text-3xl font-bold block">0</span>
+                        <span class="text-xs opacity-80">นาที</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stargazer Promise Box -->
+            <div class="bg-pink-50 rounded-xl p-4 border border-pink-200 mb-6 flex items-center justify-center gap-3 text-left">
+                <span class="text-3xl">🌸</span>
+                <p class="text-xs sm:text-sm text-pink-900">
+                    <strong>คำสัญญาของดอกลิลลี่สีชมพู:</strong> จะซื่อสัตย์ อ่อนโยน และคอยทำให้เธอมียิ้มที่สดใสแบบนี้ในทุกๆ วันค่ะ
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button id="btn-share" class="bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium px-6 py-2.5 rounded-full shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>ลิงก์ส่งให้คุณแฟน</span>
+                </button>
+                <button id="btn-restart" class="bg-pink-100 hover:bg-pink-200 text-pink-700 text-sm font-medium px-5 py-2.5 rounded-full transition flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>ดูอีกครั้ง</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto border border-pink-100">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-pink-500"></i>
+                    <span>ปรับแต่งข้อมูลน่ารักๆ</span>
+                </h3>
+                <button id="close-settings-btn" class="text-gray-400 hover:text-gray-600 p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="settings-form" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Mommy:</label>
+                    <input type="text" id="input-receiver" value=",มิ้น" class="w-full px-3 py-2 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Puppy:</label>
+                    <input type="text" id="input-sender" value="องศา" class="w-full px-3 py-2 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">ข้อความในจดหมาย:</label>
+                    <textarea id="input-letter" rows="3" class="w-full px-3 py-2 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400">ขอบคุณสำหรับทุกช่วงเวลาที่ผ่านมานะ ไม่รู้ว่าเธอสังเกตไหม แต่ทุกนาทีที่ได้คุย ได้หัวเราะด้วยกัน มันมีความหมายกับองศามากจริงๆ วันนี้เลยตั้งใจทำสิ่งนี้ขึ้นมาเพื่อถามความในใจ...</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">วันที่เริ่มต้นความสัมพันธ์:</label>
+                    <input type="date" id="input-date" class="w-full px-3 py-2 border border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400">
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-2.5 rounded-xl shadow transition">
+                        บันทึกการเปลี่ยนแปลง ✨
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-msg" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-800/90 text-white px-5 py-2.5 rounded-full text-xs sm:text-sm z-50 transition-all duration-300 opacity-0 pointer-events-none shadow-lg">
+        คัดลอกลิงก์เรียบร้อยแล้ว! ✨
+    </div>
+
+    <script>
+        /* --- STATE MANAGEMENT --- */
+        const appState = {
+            receiverName: 'VIP only',
+            senderName: 'องศา',
+            letterText: 'ขอบคุณสำหรับทุกช่วงเวลาที่ผ่านมานะ ไม่รู้ว่าเธอสังเกตไหม แต่ทุกนาทีที่ได้คุย ได้หัวเราะด้วยกัน มันมีความหมายกับองศามากจริงๆ วันนี้เลยตั้งใจทำสิ่งนี้ขึ้นมาเพื่อถามความในใจ...',
+            startDate: new Date().toISOString().split('T')[0],
+            isPlayingAudio: true,
+            yesBtnScale: 1
+        };
+
+        const steps = {
+            cover: document.getElementById('step-cover'),
+            letter: document.getElementById('step-letter'),
+            proposal: document.getElementById('step-proposal'),
+            celebration: document.getElementById('step-celebration')
+        };
+
+        /* --- INITIALIZATION --- */
+        window.addEventListener('DOMContentLoaded', () => {
+            initPetalCanvas();
+            setupEventListeners();
+            updateUIData();
+            initDefaultDate();
+        });
+
+        function initDefaultDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const formattedDate = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('input-date').value = formattedDate;
+            appState.startDate = formattedDate;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('btn-open-letter').addEventListener('click', () => switchStep('letter'));
+            document.getElementById('btn-to-proposal').addEventListener('click', () => switchStep('proposal'));
+            
+            const btnYes = document.getElementById('btn-yes');
+            const btnNo = document.getElementById('btn-no');
+
+            btnYes.addEventListener('click', handleYesClick);
+
+            // Playful Dodging No Button
+            btnNo.addEventListener('mouseenter', moveNoButton);
+            btnNo.addEventListener('click', (e) => {
+                e.preventDefault();
+                moveNoButton();
+            });
+
+            document.getElementById('btn-share').addEventListener('click', copyShareLink);
+            document.getElementById('btn-restart').addEventListener('click', () => switchStep('cover'));
+
+            document.getElementById('play-pause-btn').addEventListener('click', toggleAudio);
+
+            // Settings Modal Listeners
+            const settingsModal = document.getElementById('settings-modal');
+            document.getElementById('open-settings-btn').addEventListener('click', () => settingsModal.classList.remove('hidden'));
+            document.getElementById('close-settings-btn').addEventListener('click', () => settingsModal.classList.add('hidden'));
+            
+            document.getElementById('settings-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                appState.receiverName = document.getElementById('input-receiver').value || 'คนพิเศษ';
+                appState.senderName = document.getElementById('input-sender').value || 'ฉัน';
+                appState.letterText = document.getElementById('input-letter').value;
+                appState.startDate = document.getElementById('input-date').value;
+                
+                updateUIData();
+                settingsModal.classList.add('hidden');
+                showToast('บันทึกข้อมูลเรียบร้อยแล้ว! 🌸');
+            });
+        }
+
+        function switchStep(targetStepKey) {
+            Object.keys(steps).forEach(key => {
+                if (key === targetStepKey) {
+                    steps[key].classList.remove('hidden');
+                } else {
+                    steps[key].classList.add('hidden');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateUIData() {
+            document.getElementById('display-receiver-name').textContent = appState.receiverName;
+            document.getElementById('display-proposal-receiver').textContent = appState.receiverName;
+            document.getElementById('display-sender-name').textContent = appState.senderName;
+            document.getElementById('letter-content').textContent = appState.letterText;
+            
+            if (appState.startDate) {
+                const dateObj = new Date(appState.startDate);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('start-date-display').textContent = dateObj.toLocaleDateString('th-TH', options);
+            }
+        }
+
+        function moveNoButton() {
+            const btnNo = document.getElementById('btn-no');
+            const hintText = document.getElementById('no-hint-text');
+
+            const maxOffset = 130;
+            const randomX = (Math.random() - 0.5) * maxOffset * 2;
+            const randomY = (Math.random() - 0.5) * maxOffset * 1.5;
+
+            btnNo.style.position = 'relative';
+            btnNo.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            
+            hintText.classList.remove('opacity-0');
+            
+            // Enlarge YES button as NO dodges
+            appState.yesBtnScale += 0.12;
+            document.getElementById('btn-yes').style.transform = `scale(${appState.yesBtnScale})`;
+        }
+
+        function handleYesClick() {
+            switchStep('celebration');
+            triggerConfetti();
+            startTimer();
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                const duration = 3.5 * 1000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 5,
+                        angle: 60,
+                        spread: 60,
+                        origin: { x: 0 },
+                        colors: ['#ff4d6d', '#ff8fa3', '#ffc6ff', '#ffffff']
+                    });
+                    confetti({
+                        particleCount: 5,
+                        angle: 120,
+                        spread: 60,
+                        origin: { x: 1 },
+                        colors: ['#ff4d6d', '#ff8fa3', '#ffc6ff', '#ffffff']
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            }
+        }
+
+        function startTimer() {
+            const startDate = new Date(appState.startDate || Date.now());
+            
+            function updateCounter() {
+                const now = new Date();
+                const diffTime = Math.abs(now - startDate);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                const diffHours = Math.floor((diffTime / (1000 * 60 * 60)) % 24);
+                const diffMins = Math.floor((diffTime / 1000 / 60) % 60);
+
+                document.getElementById('counter-days').textContent = diffDays;
+                document.getElementById('counter-hours').textContent = diffHours;
+                document.getElementById('counter-mins').textContent = diffMins;
+            }
+
+            updateCounter();
+            setInterval(updateCounter, 60000);
+        }
+
+        function toggleAudio() {
+            const playIcon = document.getElementById('play-icon');
+            const progress = document.getElementById('player-progress');
+            appState.isPlayingAudio = !appState.isPlayingAudio;
+
+            if (appState.isPlayingAudio) {
+                playIcon.className = 'fa-solid fa-pause text-base';
+                progress.style.opacity = '1';
+                showToast('กำลังเล่นเพลงรัก... 🎵');
+            } else {
+                playIcon.className = 'fa-solid fa-play text-base';
+                progress.style.opacity = '0.5';
+                showToast('หยุดเพลงชั่วคราว');
+            }
+        }
+
+        function copyShareLink() {
+            const dummyUrl = window.location.href;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(dummyUrl);
+            } else {
+                document.execCommand('copy');
+            }
+            showToast('คัดลอกลิงก์เรียบร้อยแล้ว! ส่งให้คุณแฟนได้เลย 🩷');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-msg');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        function initPetalCanvas() {
+            const canvas = document.getElementById('petal-canvas');
+            const ctx = canvas.getContext('2d');
+
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const petals = [];
+            const petalCount = 30;
+
+            for (let i = 0; i < petalCount; i++) {
+                petals.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 14 + 10,
+                    speedY: Math.random() * 1.2 + 0.6,
+                    speedX: Math.random() * 0.8 - 0.4,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 1.8,
+                    opacity: Math.random() * 0.6 + 0.3,
+                    color: Math.random() > 0.5 ? '#ff4d6d' : '#ff8fa3'
+                });
+            }
+
+            function drawLilyPetal(ctx, x, y, size, rotation, color, opacity) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate((rotation * Math.PI) / 180);
+                ctx.globalAlpha = opacity;
+
+                // Gradient for floating petal
+                const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                grad.addColorStop(0, color);
+                grad.addColorStop(0.7, '#ffb3c1');
+                grad.addColorStop(1, '#ffffff');
+
+                ctx.fillStyle = grad;
+
+                ctx.beginPath();
+                ctx.moveTo(0, -size);
+                ctx.bezierCurveTo(size / 1.5, -size / 2, size / 1.8, size / 2, 0, size);
+                ctx.bezierCurveTo(-size / 1.8, size / 2, -size / 1.5, -size / 2, 0, -size);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            function animatePetals() {
+                ctx.clearRect(0, 0, width, height);
+
+                petals.forEach(p => {
+                    p.y += p.speedY;
+                    p.x += Math.sin(p.y * 0.008) + p.speedX;
+                    p.rotation += p.rotationSpeed;
+
+                    if (p.y > height + 30) {
+                        p.y = -30;
+                        p.x = Math.random() * width;
+                    }
+
+                    drawLilyPetals(ctx, p.x, p.y, p.size, p.rotation, p.color, p.opacity);
+                });
+
+                requestAnimationFrame(animatePetals);
+            }
+
+            function drawLilyPetals(ctx, x, y, size, rotation, color, opacity) {
+                drawLilyPetal(ctx, x, y, size, rotation, color, opacity);
+            }
+
+            animatePetals();
+        }
+    </script>
+</body>
+</html>
